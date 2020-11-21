@@ -3,6 +3,9 @@ uuid = "86f95416-85c3-4218-af33-789ec3ad634f"
 authors = ["Erik Engheim <erik.engheim@mac.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+SimpleDirectMediaLayer = "98e33af6-2ee5-5afd-9e75-cbc738b767c4"
+
 [compat]
 julia = "1.4"
 
