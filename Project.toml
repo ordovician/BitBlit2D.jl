@@ -1,0 +1,13 @@
+name = "BitBlit2D"
+uuid = "86f95416-85c3-4218-af33-789ec3ad634f"
+authors = ["Erik Engheim <erik.engheim@mac.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.4"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
