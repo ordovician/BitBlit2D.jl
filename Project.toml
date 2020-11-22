@@ -7,6 +7,7 @@ version = "0.1.0"
 SimpleDirectMediaLayer = "98e33af6-2ee5-5afd-9e75-cbc738b767c4"
 
 [compat]
+SimpleDirectMediaLayer = "0.2"
 julia = "1.4"
 
 [extras]
