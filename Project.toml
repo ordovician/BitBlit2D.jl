@@ -4,7 +4,7 @@ authors = ["Erik Engheim <erik.engheim@mac.com> and contributors"]
 version = "0.1.0"
 
 [deps]
-SimpleDirectMediaLayer = "98e33af6-2ee5-5afd-9e75-cbc738b767c4"
+MiniFB = "cc649173-1898-4bb8-8a16-ca5f88bd87d9"
 
 [compat]
 julia = "1.4"

@@ -1,65 +1,106 @@
 module BitBlit2D
 
-using SimpleDirectMediaLayer
-const SDL = SimpleDirectMediaLayer
+export Window
+export Rect
 
-# UInt32(SDL.WINDOW_ALLOW_HIGHDPI|SDL.WINDOW_OPENGL|SDL.WINDOW_RESIZABLE|SDL.WINDOW_SHOWN))
+export renderloop
+export draw, fillcolor
+
+import Base: show, close
+
+using MiniFB
 
 
-function main()
-    ok = SDL.Init(SDL.INIT_VIDEO)
-    println("Init: ", ok)
-    
-    win = SDL.CreateWindow(
-            "Hello World", 
-            Int32(100), Int32(100),
-            Int32(300), Int32(400),
-            UInt32(SDL.WINDOW_SHOWN))
-    SDL.SetWindowMinimumSize(win, Int32(50), Int32(50))
-
-    
-    renderer = SDL.CreateRenderer(win, Int32(-1),
-        UInt32(SDL.RENDERER_ACCELERATED | SDL.RENDERER_PRESENTVSYNC))
-    
-    SDL.IMG_Init(Int32(SDL.IMG_INIT_JPG | SDL.IMG_INIT_PNG))
-    image = SDL.IMG_Load("assets/hero/idle outline.gif")
-    SDL.IMG_SavePNG(image, "dummy.png")
-    
-    println("Image: ", image)
-    
-    tex = SDL.CreateTextureFromSurface(renderer, image)
-    SDL.FreeSurface(image)
-    println("tex: ", tex)
-    
-    w = Int[21]
-    h = Int[35]
-    
-    for i = 1:200
-        x,y = Int[1], Int[1]
-        SDL.PumpEvents()
-        # SDL.GetMouseState(pointer(x), pointer(y))
-
-        # Set render color to red ( background will be rendered in this color )
-        SDL.SetRenderDrawColor(renderer, 200, 200, 200, 255)
-        SDL.RenderClear(renderer)
-
-        # SDL.SetRenderDrawColor(renderer, 20, 50, 105, 255)
-        # SDL.RenderDrawLine(renderer,0,0,800,600)
-        #
-        rect = SDL.Rect(1,1,200,200)
-        SDL.RenderFillRect(renderer, pointer_from_objref(rect) )
-        # SDL.RenderCopy(renderer, tex, C_NULL, pointer_from_objref(SDL.Rect(x[1],y[1], w[1], h[1])))
-        SDL.RenderCopy(renderer, tex, C_NULL, C_NULL)
-
-        SDL.RenderPresent(renderer)
-        sleep(0.001)
-    end
-    SDL.DestroyRenderer(renderer)
-    SDL.DestroyWindow(win)
-    SDL.IMG_Quit()
-    SDL.Quit()
+mutable struct Window
+    width::Int
+    height::Int
+    buffer::Vector{UInt32}
+    wndptr::Ptr{Cvoid}
+    fillcolor::UInt32
 end
 
-main()
+"""
+    Window(title, width, height)
+Create a window on the screen of given proportions which we can draw in.
+"""
+function Window(title::AbstractString, width::Integer, height::Integer)
+    wndptr = mfb_open_ex(title, width, height, MiniFB.WF_RESIZABLE)
+    Window(width, height, 
+        zeros(UInt32, width*height), 
+        wndptr,
+        mfb_rgb(255, 255, 255))
+end
+
+function Window(width, height)
+    Window("Untitled", width, height)
+end
+
+function close(w::Window)
+    mfb_close(w.wndptr)
+end
+
+function show(io::IO, wnd::Window)
+    print(io, "Window($(wnd.width), $(wnd.height))")
+end
+
+struct Rect
+    x::Int
+    y::Int
+    width::Int
+    height::Int
+end
+
+function draw(wnd::Window, r::Rect)
+    x, y = r.x, r.y
+    w, h = r.width, r.height
+    
+    for j in y:(y + h)
+        x0 = x + j*wnd.width
+        for i in x0:(x0 + w)
+            wnd.buffer[i] = wnd.fillcolor
+        end
+    end    
+end
+
+function fillcolor(w::Window, red, green, blue)
+    w.fillcolor = mfb_rgb(255, 255, 255)
+end
+
+quit = false
+
+
+function keycallback(window::Ptr{Cvoid}, key::mfb_key, mod::mfb_key_mod, isPressed::Bool)
+    if isPressed
+        if key == MiniFB.KB_KEY_Q
+            global quit = true
+        end
+        println("key was pressed: ", key, ", modifier: ", mod)
+        
+    end
+end
+
+function renderloop(w::Window)
+    mfb_set_keyboard_callback(w.wndptr, keycallback)
+    global quit = false
+
+    while mfb_wait_sync(w.wndptr)
+
+
+        state = mfb_update(w.wndptr, w.buffer)
+        if state != MiniFB.STATE_OK
+            break
+        end
+        
+        if quit
+            mfb_update(w.wndptr, w.buffer)
+            break
+        end
+    end
+    close(w)
+end
+
+w = Window("Hello World", 400, 500)
+draw(w, Rect(10, 10, 200, 120))
+renderloop(w)
 
 end
