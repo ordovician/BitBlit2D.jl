@@ -7,6 +7,7 @@ version = "0.1.0"
 MiniFB = "cc649173-1898-4bb8-8a16-ca5f88bd87d9"
 
 [compat]
+MiniFB = "0.1"
 julia = "1.4"
 
 [extras]
