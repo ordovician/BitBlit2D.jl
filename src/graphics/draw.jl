@@ -51,7 +51,7 @@ function draw!(canvas::Image, img::Image, x::Integer, y::Integer)
     canvas
 end
 
-function draw!(canvas::Image, img::Image, p::Point{Int})
+function draw!(canvas::Image, img::Image, p::Point{<:Integer})
     draw!(canvas, img, p.x, p.y)
 end
 
@@ -61,7 +61,7 @@ end
     
 Fill a rectangular area defined by `r` with the color `c`.
 """
-function fill!(canvas::Image, r::Rect, color::Colorant)
+function fill!(canvas::Image, r::Rect{<:Integer}, color::Colorant)
     x, y = r.x, r.y
     h, w = size(r)
     canvas[x:x+w, y:y+h] = c

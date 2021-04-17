@@ -41,7 +41,7 @@ end
 function getindex(img::Image, X::UnitRange{Int}, Y::UnitRange{Int})
     I = first(Y)+1:last(Y)
     J = first(X)+1:last(X)
-    img.pixels[I, J]
+    Image(img.pixels[I, J])
 end
 
 function getindex(img::Image, x::Int, Y::UnitRange{Int})
