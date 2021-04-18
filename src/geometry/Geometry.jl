@@ -32,9 +32,12 @@ height(r::Union{Rect, Size}) = r.height
 # Allows you to do things such as:
 #  x, y, w, h = Rect(2, 4, 20, 30)
 function iterate(t::Union{Point, Vec2D, Size, Rect}, i::Int=1)
-    if i <= i <= fieldcount(typeof(t))
+    if 1 <= i <= fieldcount(typeof(t))
         (getfield(t, i), i+1)
     else
         nothing
     end
 end
+
+include("point.jl")
+include("vec2d.jl")

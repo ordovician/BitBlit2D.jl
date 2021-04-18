@@ -33,6 +33,7 @@ of the `screen` image will shine through.
 """
 function draw!(canvas::Image, img::Image, x::Integer, y::Integer)
     w, h = size(img)
+    cw, ch = size(canvas)
     x0 = 0
     x1 = x
     
@@ -40,7 +41,9 @@ function draw!(canvas::Image, img::Image, x::Integer, y::Integer)
         y0, y1 = 0, y
         while y0 < h
             color = canvas[x1, y1]
-            canvas[x1, y1] = blend(img[x0, y0], color)
+            if 0 <= x1 < cw && 0 <= y1 < ch
+                canvas[x1, y1] = blend(img[x0, y0], color)
+            end
             y0 += 1
             y1 += 1
         end

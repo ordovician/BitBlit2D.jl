@@ -1,3 +1,5 @@
+export Sprite, draw!
+
 """
 A visualization of a game character, static object or tile
 in the game world. While you can use this directly, ideally

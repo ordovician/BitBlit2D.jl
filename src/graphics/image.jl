@@ -3,17 +3,29 @@ using Colors, FileIO
 import Base: getindex, setindex!, size, show
 
 export Image, width, height
+export pixels
 
-struct Image
-   pixels::Matrix{RGBA} 
+struct Image{T<:Colorant}
+   pixels::Matrix{T} 
 end
 
 """
     Image(filename)
-Creates an image from an image file stored on disk.
+Creates an image from an image file stored on disk. If loading
+a `gif` image, this will produce multiple images
 """
 function Image(filename::AbstractString)
-    Image(load(filename))
+    pixels = load(filename)
+    dims = ndims(pixels)
+    if dims == 2
+        Image(pixels)
+    elseif dims == 3
+        map(1:size(pixels, 3)) do i
+           Image(pixels[:, :, i]) 
+        end
+    else
+        error("Don't support loading imagse with $dims dimensions")
+    end
 end
 
 """
@@ -21,7 +33,7 @@ end
 Creates a blank image of width `w` and height `h`.
 """
 function Image(w::Int, h::Int)
-    Image(zeros(RGBA, h, w))
+    Image(fill(colorant"black", h, w))
 end
 
 """
@@ -65,6 +77,10 @@ Gets the width and the height of image `img`.
 """
 size(img::Image) = Size(width(img), height(img))
 
-# function show(io::IO, img::Image)
-#     show(io, img.pixels)
-# end
+function show(io::IO, img::Image)
+    show(io, img.pixels)
+end
+
+function pixels(img::Image)
+   img.pixels 
+end
