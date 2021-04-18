@@ -29,21 +29,39 @@ blend(a::RGB, b::Colorant) = a
     
 Draws an image `img` onto image `canvas` at location `(x, y)`. This operation
 uses alpha blending. Thus if `img` has areas which are partially transparent, then parts
-of the `screen` image will shine through.    
+of the `screen` image will shine through.
+
+This will clip the `img` image, so that if you draw outside the `canvas` image you willl
+not get out of bounds error.    
 """
 function draw!(canvas::Image, img::Image, x::Integer, y::Integer)
     w, h = size(img)
     cw, ch = size(canvas)
-    x0 = 0
+    
+    w = min(x + w, cw) - x
+    h = min(y + h, ch) - y
+    
+    x_src, y_src = 0, 0
+    
+    
+    if x < 0
+        x_src = -x
+        x = 0
+    end
+    
+    if y < 0
+       y_src = -y
+       y = 0
+    end
+    
+    x0 = x_src
     x1 = x
     
     while x0 < w
-        y0, y1 = 0, y
+        y0, y1 = y_src, y
         while y0 < h
             color = canvas[x1, y1]
-            if 0 <= x1 < cw && 0 <= y1 < ch
-                canvas[x1, y1] = blend(img[x0, y0], color)
-            end
+            canvas[x1, y1] = blend(img[x0, y0], color)
             y0 += 1
             y1 += 1
         end

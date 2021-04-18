@@ -1,53 +1,56 @@
-export Sprite, draw!
+export Sprite, draw!, parent, position, position, position!, visible!, visible
+
+abstract type Sprite end
 
 """
-A visualization of a game character, static object or tile
-in the game world. While you can use this directly, ideally
-you use it with higher level objects like `Actor` to manage
-its location in the world.
+    parent(sprite) -> Union{Sprite, Nothing}
+A sprite can be a child of another sprite. In this case its position would be relative
+to the position of the parent sprite.
 """
-struct Sprite
-    frames::Vector{Image}
-end
+parent(sprite::Sprite) = nothing
 
 """
-    Sprite(sheet::Image, rows, cols)
-Constructs a sprite made up of multiple images found on a sprite sheet. We assume
-that the sprite sheet is made up of multiple rows and columns, each showing the
-character doing some different action or representing a static object in different states.
-
-Pixel data is copied and not referenced, so don't try to share a sheet between multiple
-sprites. Instead it would be better to share a sprite with multiple `Actor` objects
+    draw!(canvas::Image, sprite)
+Draws sprite with current frame and position on canvas.
 """
-function Sprite(sheet::Image, rows::Integer, cols::Integer)
-    sheet_width, sheet_height = size(sheet)
-    w, h = sheet_width/cols, sheet_height/rows
-    
-    frames = Image[]
-    for row in 1:rows
-        y0 = row*h
-        for col in 1:cols
-            x0 = col*w
-            push!(frames, Image[x0:x0+w, y0:y0+h])
-        end
+function draw! end
+
+"""
+    position(sprite) -> Point
+Position of `sprite` in local coordinate system.
+"""
+function position end
+
+"""
+    position!(sprite, pos::Point)
+Set position of `sprite` to `pos`. This is position relative to parents sprite.
+"""
+function position! end
+
+"""
+    world_position(sprite) -> Point
+Abosolute position on the coordinate system of the canvas where we draw
+all objects.
+"""
+function world_position(sprite::Sprite)
+    if isnothing(parent(sprite))
+        position(sprite)
+    else
+        position(parent(sprite)) + position(sprite)
     end
-    
-    Sprite(frames)
 end
 
 """
-    draw!(canvas::Image, sprite, x, y, frame=1)
+    visible!(sprite::Sprite, visible = true)
+Set a sprite visible or hidden. If it is hidden it will not be drawn when
+the `draw!` call is made.
 """
-function draw!(canvas::Image, spr::Sprite, x::Integer, y::Integer, frame::Integer = 1)
-    draw!(canvas, spr.frames[frame], x, y)
-end
+function visible! end
 
 """
-    draw!(canvas::Image, sprite, pos, frame=1)
-Draws sprite on canvas at position given as `(x, y)` or `pos`, using given `frame`
-number. A sprite has multiple frames. This allows you to show a character doing different
-things such as picking something up, walking or using a sword. 
+    visible(sprite::Sprite)
+Check if sprite is visible. If it is true, then a `draw!(canvas, sprite)` call
+will make it appear on the canvas.
 """
-function draw!(canvas::Image, spr::Sprite, pos::Point{<:Integer}, frame::Integer = 1)
-    draw!(canvas, spr.frames[frame], pos)
-end
+function visible end
+
