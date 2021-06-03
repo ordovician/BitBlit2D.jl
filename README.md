@@ -17,18 +17,19 @@ This will cause the Julia REPL to block and show windows
     julia> renderloop(w)
 
 # Current Status and Thoughts
-This project is put in limbo, as I am not sure of future directions. As one starts to think of hierarchies of objects, collision detection etc, it becomes clearly that this quickly becomes a larger
-project than I intended.
+Got going again. Current conclusion is to keep things simple. Abandoned idea of sprites in hierarchies. It is better for each game to simply hardcode this. This isn't a C++ style engine. Making a custom game object is easy and fast. We don't need lots of prefabricated overengineered object-hierarchies.
 
-- Should game objects be part of a traditional scene graph? If so then we need a system to traverse it and draw things in proper order.
-- Ideally we treat each object independently, but then things like collision detection becomes tricky as it will involve sorting multiple objects in some spatial fashion before checking if they overlap.
-- Accurate collision detection would require having a mask to check against. That requires calculating overlapping rectangles and then checking pixel/bit values against each other.
+Instead we will do like many other simple 2D game engines: Provide the important building blocks to allow construction of simple games. These are the things we want to be able to provide as ready made chunks of functionality:
 
-The scope easily becomes large enough that I might reconsider simply using something like Godot. Why reinvent the wheel?
+- Sprites to keep track of position and frame being drawn.
+- Rigid bodies of some sort to handle physics stuff. At least stuff like velocity, gravity etc.
+- Collision detection. Provide some shapes that can do intersection testing. Hierarchies.
+- Path following?
+- Loading sprite sheets, and game levels from standard tools.
 
-The aim of this project is to have a simple implementation of a sprite system. If the implementation gets complicated, then I deviate from that goal. It is hard to reconcile the simplicity I want with the features I want. Some possible ways out:
+Other than this, I think writing our own custom game loop is actually preferable. If you are going to teach people how this works, you might as well show how the internals work. Expose the fact that we deal with delta times etc.
 
-- Abandon the idea that sprites are in hierarchies. This complicates things like ordering and rendering. It complicates thought around how objects should be processes in a general fashion.
+Make each game entity custom. Make own concrete type for heroes, enemies etc. 
 
 ## What Works and Doesn't Work?
 A lot of the code is quick hash out of ideas and not properly tested. Creating images and drawing them should work. Mostly anything else may in principle be broken.

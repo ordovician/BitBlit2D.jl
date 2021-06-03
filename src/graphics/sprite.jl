@@ -1,42 +1,38 @@
 export Sprite, draw!, parent, position, position, position!, visible!, visible
 
-abstract type Sprite end
+"""
+A visualization of a game character, static object or tile
+in the game world. While you can use this directly, ideally
+you use it with higher level objects like `Actor` to manage
+its location in the world.
+"""
+mutable struct Sprite
+    parent::Union{Sprite, Nothing}
+    pos::Point{Float64}
+    frames::Vector{Image}
+    frame::Int
+    visible::Bool
+end
+
 
 """
-    parent(sprite) -> Union{Sprite, Nothing}
-A sprite can be a child of another sprite. In this case its position would be relative
-to the position of the parent sprite.
+    Sprite(frames)
+Create a sprite with given frames and an optional parent sprite,
+for which sprite position will be relative to.
 """
-parent(sprite::Sprite) = nothing
+function Sprite(frames::AbstractVector{Image}, pos = Point(0.0, 0.0))
+    Sprite(nothing, pos, frames, 1, true)
+end
 
 """
     draw!(canvas::Image, sprite)
-Draws sprite with current frame and position on canvas.
+Draws sprite on canvas using position `world_position(sprite)` and 
+current frame. 
 """
-function draw! end
-
-"""
-    position(sprite) -> Point
-Position of `sprite` in local coordinate system.
-"""
-function position end
-
-"""
-    position!(sprite, pos::Point)
-Set position of `sprite` to `pos`. This is position relative to parents sprite.
-"""
-function position! end
-
-"""
-    world_position(sprite) -> Point
-Abosolute position on the coordinate system of the canvas where we draw
-all objects.
-"""
-function world_position(sprite::Sprite)
-    if isnothing(parent(sprite))
-        position(sprite)
-    else
-        position(parent(sprite)) + position(sprite)
+function draw!(canvas::Image, sprite::Sprite)
+    if sprite.visible
+        frame = sprite.frame
+        draw!(canvas, sprite.frames[frame], sprite.pos)
     end
 end
 
@@ -45,12 +41,16 @@ end
 Set a sprite visible or hidden. If it is hidden it will not be drawn when
 the `draw!` call is made.
 """
-function visible! end
+function visible!(sprite::Sprite, visible = true)
+    sprite.visible = visible
+end
 
 """
     visible(sprite::Sprite)
 Check if sprite is visible. If it is true, then a `draw!(canvas, sprite)` call
 will make it appear on the canvas.
 """
-function visible end
+function visible(sprite::Sprite)
+    sprite.visible
+end
 
