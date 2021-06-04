@@ -77,9 +77,9 @@ Gets the width and the height of image `img`.
 """
 size(img::Image) = Size(width(img), height(img))
 
-function show(io::IO, img::Image)
-    show(io, img.pixels)
-end
+show(io::IO, mime::MIME"text/plain", img::Image)    = show(io, mime, img.pixels)
+show(io::IO, mime::MIME"image/svg+xml", img::Image) = show(io, mime, img.pixels)
+
 
 function pixels(img::Image)
    img.pixels 

@@ -12,6 +12,10 @@ struct Vec2D{T <: Number}
   dy::T
 end
 
+include("point.jl")
+include("vec2d.jl")
+include("rect.jl")
+
 # Allows you to do things such as:
 #  x, y, w, h = Rect(2, 4, 20, 30)
 function iterate(t::Union{Point, Vec2D, Size, Rect}, i::Int=1)
@@ -21,6 +25,3 @@ function iterate(t::Union{Point, Vec2D, Size, Rect}, i::Int=1)
         nothing
     end
 end
-
-include("point.jl")
-include("vec2d.jl")

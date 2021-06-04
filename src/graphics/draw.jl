@@ -87,3 +87,7 @@ function fill!(canvas::Image, r::Rect{<:Integer}, color::Colorant)
     h, w = size(r)
     canvas[x:x+w, y:y+h] = c
 end
+
+function fill!(img::Image, color::Colorant)
+   img[:] = color 
+end
